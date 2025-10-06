@@ -1,0 +1,26 @@
+{
+  "name": "procesos2526",
+  "version": "1.0.0",
+  "description": "Proyecto del curso 2025-2026",
+  "homepage": "https://github.com/jgallud/procesos2526#readme",
+  "bugs": {
+    "url": "https://github.com/jgallud/procesos2526/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgallud/procesos2526.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "testW": "node_modules\\.bin\\jasmine-node servidor",
+    "test": "./node_modules/.bin/jasmine-node servidor"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "jasmine-node": "^3.0.0"
+  }
+}
