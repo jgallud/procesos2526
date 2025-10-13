@@ -5,7 +5,25 @@
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <title>Procesos 25-26</title>
  <!--<script src="./modelo.js"></script>-->
+ <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+ <script src="./cliente/clienteRest.js"></script>
 </head>
 <body>
+    <script>
+      const cliente=new ClienteRest();
+      async function main(){
+        await cliente.obtenerUsuarios();
+        await cliente.agregarUsuario("pepe");
+        await cliente.obtenerUsuarios();
+        await cliente.agregarUsuario("ana");
+        await cliente.obtenerUsuarios();
+        await cliente.eliminarUsuario("pepe");
+        await cliente.obtenerUsuarios();
+        await cliente.numeroUsuarios();
+        await cliente.usuarioActivo("ana");
+        await cliente.usuarioActivo("pepe");
+      }
+      main();
+    </script>
 </body>
 </html>

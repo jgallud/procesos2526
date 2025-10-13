@@ -14,7 +14,12 @@ function Sistema(){
  }
  
  this.obtenerUsuarios=function(){
- return this.usuarios;
+   let lista=[];
+   for (let u in this.usuarios){
+     lista.push({"nick":this.usuarios[u].nick});
+   }
+   return lista;
+   //return this.usuarios; ;
  }
 
  this.usuarioActivo=function(nick){
@@ -22,7 +27,16 @@ function Sistema(){
  }
 
  this.eliminarUsuario=function(nick){
-    delete this.usuarios[nick];
+   res={"nick":-1};
+   if (this.usuarios[nick]){
+     delete this.usuarios[nick];
+     res.nick=nick;  
+   }
+   return res;
+ }
+
+ this.numeroUsuarios=function(){
+   return Object.keys(this.usuarios).length;
  }
 }
 
