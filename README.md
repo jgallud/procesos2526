@@ -6,6 +6,10 @@ El proyecto de la asignatura tiene una parte común que se explone públicamente
 
 La parte pública tiene como objetivo preparar la estructura de una aplicación SaaS en la que la parte del backend sigue una arquitectura en capas (presentación, lógica y datos), mientras que el cliente sigue el patrón MVC.
 
+Para la gestión del proyecto utilizamos Jira Scrum con historias de usuario estimadas con SP y contabilizando las horas dedicadas en cada sprint.
+
+Para el desarrollo del proyecto utilizamos NodeJS-Express y MongoDB en el servidor, y en el cliente HTML, CSS y Javascript. La idea es que cada alumno explore, si lo desea, el uso de algún framework de cliente. 
+
 
 ## Sprint 1. Implementar la arquitectura base del proyecto
 Este primer sprint se estructura en 7 bloques:

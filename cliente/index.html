@@ -1,29 +1,62 @@
 <!DOCTYPE html>
 <html>
+
 <head>
- <meta charset="utf-8">
- <meta name="viewport" content="width=device-width, initial-scale=1">
- <title>Procesos 25-26</title>
- <!--<script src="./modelo.js"></script>-->
- <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
- <script src="./cliente/clienteRest.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Procesos 25-26</title>
+  <!--<script src="./modelo.js"></script>-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./cliente/clienteRest.js"></script>
+  <script src="./cliente/controlWeb.js"></script>
 </head>
+
 <body>
-    <script>
-      const cliente=new ClienteRest();
-      async function main(){
-        await cliente.obtenerUsuarios();
-        await cliente.agregarUsuario("pepe");
-        await cliente.obtenerUsuarios();
-        await cliente.agregarUsuario("ana");
-        await cliente.obtenerUsuarios();
-        await cliente.eliminarUsuario("pepe");
-        await cliente.obtenerUsuarios();
-        await cliente.numeroUsuarios();
-        await cliente.usuarioActivo("ana");
-        await cliente.usuarioActivo("pepe");
-      }
-      main();
-    </script>
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <!-- Brand/logo -->
+    <a class="navbar-brand" href="#">Logo</a>
+
+    <!-- Links -->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link 1</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link 2</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link 3</a>
+      </li>
+    </ul>
+  </nav>
+  <div class="container-fluid">
+    <h3>Mi Innovadora Obsoleta App</h3>
+    <p>Procesos de Ingeniería del Software 25-26</p>
+    <div id="au"></div>
+  </div>
+
+  <script>
+    const rest = new ClienteRest();
+    const cw = new ControlWeb();
+    cw.mostrarAgregarUsuario();
+    // async function main(){
+    //   await cliente.obtenerUsuarios();
+    //   await cliente.agregarUsuario("pepe");
+    //   await cliente.obtenerUsuarios();
+    //   await cliente.agregarUsuario("ana");
+    //   await cliente.obtenerUsuarios();
+    //   await cliente.eliminarUsuario("pepe");
+    //   await cliente.obtenerUsuarios();
+    //   await cliente.numeroUsuarios();
+    //   await cliente.usuarioActivo("ana");
+    //   await cliente.usuarioActivo("pepe");
+    // }
+    // main();
+  </script>
 </body>
+
 </html>
