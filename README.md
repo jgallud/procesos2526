@@ -12,6 +12,12 @@ Para el desarrollo del proyecto utilizamos NodeJS-Express y MongoDB en el servid
 
 
 ## Sprint 1. Implementar la arquitectura base del proyecto
+El sprint 1 tiene por objetivo construir todos los componentes de la arquitectura de la solución, por eso la denominamos arquitectura base.
+
+El sprint implementa una pequeña funcionalidad de forma vertical, con idea de mostrar todos los componentes, tanto del servidor como del cliente. El único componente que no se incluye es el de la capa de acceso a datos.
+
+El sprint finaliza desplegando este prototipo básico en el servicio de Cloud Run de Google Cloud Platform. El despliegue se puede hacer en línea de comandos o conectando el repositorio de GitHub.
+
 Este primer sprint se estructura en 7 bloques:
 1. Puesta en marcha del proyecto
 2. Implementar la capa lógica y las pruebas
