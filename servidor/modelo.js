@@ -16,7 +16,7 @@ function Sistema(){
  this.obtenerUsuarios=function(){
    let lista=[];
    for (let u in this.usuarios){
-     lista.push({"nick":this.usuarios[u].nick});
+     lista.push({"nick":this.usuarios[u].nick}); //agregar otra informacion
    }
    return lista;
    //return this.usuarios; ;

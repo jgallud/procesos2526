@@ -11,7 +11,7 @@ function ControlWeb() {
         cadena = cadena + '</div>';
 
         $("#au").append(cadena);
-        $('#btnGS').load("./cliente/botonGS.html");
+        //$('#btnGS').load("./cliente/botonGS.html");
         //#au .btn div
         $("#btnAU").on("click", function () {
             let nick = $("#nick").val();
