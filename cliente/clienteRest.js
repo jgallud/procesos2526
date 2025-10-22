@@ -4,6 +4,7 @@ function ClienteRest() {
         $.getJSON("/agregarUsuario/" + nick, function (data) {
             if (data.nick != -1) {
                 console.log("Usuario " + nick + " ha sido registrado");
+                $.cookie("nick",data.nick);
                 cw.mostrarHome(nick);
             }
             else {

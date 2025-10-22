@@ -1,4 +1,13 @@
 function ControlWeb() {
+    this.comprobarSesion=function(){
+        let nick=$.cookie("nick");
+        if (nick){
+            this.mostrarHome(nick);
+        }
+        else{
+            this.mostrarAgregarUsuario();
+        }
+    }
     this.mostrarAgregarUsuario = function () {
         //this.limpiar();
         $('#mAU').remove();
@@ -6,6 +15,7 @@ function ControlWeb() {
         cadena = cadena + '<label for="nick">Introduce un nick:</label>';
         cadena = cadena + '<input type="text" class="form-control" id="nick">';
         cadena = cadena + '<button id="btnAU" type="submit" class="btn btn-primary">Agregar usuario</button>';
+        cadena=cadena+'<div><a href="/auth/google">Acceso Google</a></div>';
         cadena = cadena + '<div id="btnGS"></div>';
         cadena = cadena + '<div id="msg"></div>'
         cadena = cadena + '</div>';
@@ -18,7 +28,7 @@ function ControlWeb() {
             rest.agregarUsuario(nick);
         });
     }
-     this.mostrarHome = function (nick) {
+    this.mostrarHome = function (nick) {
         //this.limpiar();
         //let nick = $.cookie("nick"); //podría ser parámetro de la función
         //ws.email=nick;
@@ -27,6 +37,10 @@ function ControlWeb() {
         let cadena = "<div id='mH'><h2>Bienvenido " + nick + " al sistema</h2></div>";
         $("#au").append(cadena);
         //this.mostrarCrearPartida();
+    }
+    this.salir=function(){
+        $.removeCookie("nick");
+        location.reload();
     }
    
 }
