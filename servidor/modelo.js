@@ -1,47 +1,64 @@
-function Sistema(){
- this.usuarios={};
- 
- this.agregarUsuario=function(nick){
-   let res={"nick":-1};
-   if (!this.usuarios[nick]){
-   this.usuarios[nick]=new Usuario(nick);
-   res.nick=nick;
-   }
-   else{
-   console.log("el nick "+nick+" está en uso");
-   }
-   return res;
- }
- 
- this.obtenerUsuarios=function(){
-   let lista=[];
-   for (let u in this.usuarios){
-     lista.push({"nick":this.usuarios[u].nick}); //agregar otra informacion
-   }
-   return lista;
-   //return this.usuarios; ;
- }
+const datos = require("./cad.js");
 
- this.usuarioActivo=function(nick){
-    return this.usuarios[nick]!=undefined;
- }
+function Sistema() {
+  this.usuarios = {};
+  this.cad = new datos.CAD();
 
- this.eliminarUsuario=function(nick){
-   res={"nick":-1};
-   if (this.usuarios[nick]){
-     delete this.usuarios[nick];
-     res.nick=nick;  
-   }
-   return res;
- }
+  this.usuarioGoogle = function (usr, callback) {
+    let modelo = this;
+    this.cad.buscarOCrearUsuario(usr, function (obj) {
+      callback(obj);
+      //modelo.agregarUsuario(obj.email);
 
- this.numeroUsuarios=function(){
-   return Object.keys(this.usuarios).length;
- }
+    });
+  }
+
+  this.agregarUsuario = function (nick) {
+    let res = { "nick": -1 };
+    if (!this.usuarios[nick]) {
+      this.usuarios[nick] = new Usuario(nick);
+      res.nick = nick;
+    }
+    else {
+      console.log("el nick " + nick + " está en uso");
+    }
+    return res;
+  }
+
+  this.obtenerUsuarios = function () {
+    let lista = [];
+    for (let u in this.usuarios) {
+      lista.push({ "nick": this.usuarios[u].nick }); //agregar otra informacion
+    }
+    return lista;
+    //return this.usuarios; ;
+  }
+
+  this.usuarioActivo = function (nick) {
+    return this.usuarios[nick] != undefined;
+  }
+
+  this.eliminarUsuario = function (nick) {
+    res = { "nick": -1 };
+    if (this.usuarios[nick]) {
+      delete this.usuarios[nick];
+      res.nick = nick;
+    }
+    return res;
+  }
+
+  this.numeroUsuarios = function () {
+    return Object.keys(this.usuarios).length;
+  }
+
+  this.cad.conectar(function (db) {
+    console.log("Conectado a Mongo Atlas");
+    // Aquí puedes realizar operaciones con la base de datos
+  });
 }
 
-function Usuario(nick){
- this.nick=nick;
+function Usuario(nick) {
+  this.nick = nick;
 }
 
-module.exports.Sistema=Sistema;
+module.exports.Sistema = Sistema;
