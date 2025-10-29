@@ -4,6 +4,22 @@ function Sistema() {
   this.usuarios = {};
   this.cad = new datos.CAD();
 
+  this.registrarUsuario = function (obj, callback) {
+    let modelo = this;
+    if (!obj.nick) {
+      obj.nick = obj.email;
+    }
+    this.cad.buscarUsuario(obj, function (usr) {
+      if (!usr) {
+        modelo.cad.insertarUsuario(obj, function (res) {
+          callback(res);
+        });
+      }
+      else {
+        callback({ "email": -1 });
+      }
+    });
+  }
   this.usuarioGoogle = function (usr, callback) {
     let modelo = this;
     this.cad.buscarOCrearUsuario(usr, function (obj) {

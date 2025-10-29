@@ -4,7 +4,7 @@ const passport = require("passport");
 const cookieSession = require("cookie-session");
 require("./servidor/passport-setup.js");
 const app = express();
-const bodyParser=require("body-parser");
+const bodyParser = require("body-parser");
 const modelo = require("./servidor/modelo.js");
 const PORT = process.env.PORT || 3000;
 
@@ -18,7 +18,7 @@ app.use(cookieSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 let sistema = new modelo.Sistema();
@@ -66,6 +66,15 @@ app.get("/good", function (request, response) {
 app.get("/fallo", function (request, response) {
     response.send({ nick: "nook" })
 });
+
+app.post("/registrarUsuario", function (request, response) {
+    sistema.registrarUsuario(request.body, function (res) {
+        response.send({ "nick": res.email });
+    });
+});
+
+app.post('/loginUsuario', passport.authenticate("local", { failureRedirect: "/fallo", successRedirect: "/ok" })
+);
 
 app.get("/agregarUsuario/:nick", function (request, response) {
     let nick = request.params.nick;

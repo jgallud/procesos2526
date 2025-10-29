@@ -1,12 +1,42 @@
 function ControlWeb() {
-    this.comprobarSesion=function(){
-        let nick=$.cookie("nick");
-        if (nick){
+    this.comprobarSesion = function () {
+        let nick = $.cookie("nick");
+        if (nick) {
             this.mostrarHome(nick);
         }
-        else{
-            this.mostrarAgregarUsuario();
+        else {
+            //this.mostrarAgregarUsuario();
+            this.mostrarRegistro();
         }
+    }
+    this.mostrarRegistro = function () {
+        $("#fmRegistro").remove();
+        $("#registro").load("./cliente/registro.html", function () {
+            $("#btnRegistro").on("click", function (e) {
+                e.preventDefault();
+                let email = $("#email").val();
+                let pwd = $("#pwd").val();
+                if (email && pwd) {
+                    rest.registrarUsuario(email,pwd);
+                    console.log(email + " " + pwd);
+                }
+            });
+        });
+    }
+     this.mostrarLogin = function () {
+        this.limpiar();
+        $("#registro").load("./cliente/login.html", function () {
+            $('#btnGS').load("./cliente/botonGS.html");
+            $("#btnLogin").on("click", function (e) {
+                e.preventDefault();
+                let email = $("#email").val();
+                let pwd = $("#pwd").val();
+                if (email && pwd) {
+                    rest.loginUsuario(email, pwd);
+                    console.log(email + " " + pwd);
+                }
+            });
+        });
     }
     this.mostrarAgregarUsuario = function () {
         //this.limpiar();
@@ -15,7 +45,7 @@ function ControlWeb() {
         cadena = cadena + '<label for="nick">Introduce un nick:</label>';
         cadena = cadena + '<input type="text" class="form-control" id="nick">';
         cadena = cadena + '<button id="btnAU" type="submit" class="btn btn-primary">Agregar usuario</button>';
-        cadena=cadena+'<div><a href="/auth/google">Acceso Google</a></div>';
+        cadena = cadena + '<div><a href="/auth/google">Acceso Google</a></div>';
         cadena = cadena + '<div id="btnGS"></div>';
         cadena = cadena + '<div id="msg"></div>'
         cadena = cadena + '</div>';
@@ -38,9 +68,9 @@ function ControlWeb() {
         $("#au").append(cadena);
         //this.mostrarCrearPartida();
     }
-    this.salir=function(){
+    this.salir = function () {
         $.removeCookie("nick");
         location.reload();
     }
-   
+
 }
