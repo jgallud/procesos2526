@@ -19,21 +19,21 @@ El sprint implementa una pequeña funcionalidad de forma vertical, con idea de m
 El sprint finaliza desplegando este prototipo básico en el servicio de Cloud Run de Google Cloud Platform. El despliegue se puede hacer en línea de comandos o conectando el repositorio de GitHub.
 
 Este primer sprint se estructura en 7 bloques:
-1.1 Puesta en marcha del proyecto
-1.2 Implementar la capa lógica y las pruebas
-1.3 Implementar el backend
-1.4 Implementar la capa Rest
-1.5 Implementar el componente de comunicación Rest
-1.6 Implementar el componente de visualización
-1.7 Desplegar el prototipo
+1. Puesta en marcha del proyecto
+2. Implementar la capa lógica y las pruebas
+3. Implementar el backend
+4. Implementar la capa Rest
+5. Implementar el componente de comunicación Rest
+6. Implementar el componente de visualización
+7. Desplegar el prototipo
 
 ## Sprint 2. Gestión de usuarios y autenticación
 El sprint 2 tiene por objetivo la gestión de usuarios locales y con OAuth. Antes de abordar esas cuestiones, se plantea la problemática de la gestión del estado (LocalStorage y Cookies).
 
 Los bloques del sprint 2 son los siguientes:
-2.1 Gestionar el estado de la aplicación
-2.2 Implementar autorización de terceros con Google
-2.3 Implementar la capa de acceso a datos
-2.4 Implementar Google One Tap
-2.5 Implementar registro de usuarios locales
-2.6 Implementar inicio de sesión de usuarios locales
+1. Gestionar el estado de la aplicación
+2. Implementar autorización de terceros con Google
+3. Implementar la capa de acceso a datos
+4. Implementar Google One Tap
+5. Implementar registro de usuarios locales
+6. Implementar inicio de sesión de usuarios locales
