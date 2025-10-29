@@ -10,6 +10,19 @@ Para la gestión del proyecto utilizamos Jira Scrum con historias de usuario est
 
 Para el desarrollo del proyecto utilizamos NodeJS-Express y MongoDB en el servidor, y en el cliente HTML, CSS y Javascript. La idea es que cada alumno explore, si lo desea, el uso de algún framework de cliente. 
 
+## Instalacion
+Descarga el repositorio.
+Para que funcione OAuth de Goole hay que definir unas credenciales en la consola de GCP (API y Servicios | Credenciales) usando las url "http://localhost:3000" y "http://localhost:3000/google/callback".
+Para que funcione la capa de acceso a datos se debe definir una cadena de conexión (a Monto Atlas o local).
+Esas cadenas se pueden incluir en un archivo .env con las siguientes variables de entorno: clientID, secretID, url y connectionString.
+Una vez realizado esas operaciones, ejecutar los siguientes comandos:
+'''
+npm i
+npm run dev
+'''
+
+Con ese mismo código se puede implementar integración continúa definiendo esas variables de entorno en el despliegue correspondiente. En el curso utilizamos integración continúa basada en GitHub conectado a un servicio de Cloud Run de GCP.
+
 
 ## Sprint 1. Implementar la arquitectura base del proyecto
 El sprint 1 tiene por objetivo construir todos los componentes de la arquitectura de la solución, por eso la denominamos arquitectura base.
