@@ -6,7 +6,7 @@ function ControlWeb() {
         }
         else {
             //this.mostrarAgregarUsuario();
-            this.mostrarRegistro();
+            this.mostrarLogin();
         }
     }
     this.mostrarRegistro = function () {
@@ -71,6 +71,13 @@ function ControlWeb() {
     this.salir = function () {
         $.removeCookie("nick");
         location.reload();
+    }
+     this.limpiar = function () {
+        $("#txt").remove();
+        $('#mAU').remove();
+        $('#mH').remove();
+        $("#fmLogin").remove();
+        $("#fmRegistro").remove();
     }
 
 }

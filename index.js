@@ -4,6 +4,7 @@ const passport = require("passport");
 const cookieSession = require("cookie-session");
 require("./servidor/passport-setup.js");
 const app = express();
+const LocalStrategy = require('passport-local').Strategy;
 const bodyParser = require("body-parser");
 const modelo = require("./servidor/modelo.js");
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,15 @@ app.use(cookieSession({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+passport.use(new
+    LocalStrategy({ usernameField: "email", passwordField: "password" },
+        function (email, password, done) {
+            sistema.loginUsuario({ "email": email, "password": password }, function (user) {
+                return done(null, user);
+            })
+        }
+    ));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -75,6 +85,10 @@ app.post("/registrarUsuario", function (request, response) {
 
 app.post('/loginUsuario', passport.authenticate("local", { failureRedirect: "/fallo", successRedirect: "/ok" })
 );
+
+app.get("/ok", function (request, response) {
+    response.send({ nick: request.user.email })
+});
 
 app.get("/agregarUsuario/:nick", function (request, response) {
     let nick = request.params.nick;

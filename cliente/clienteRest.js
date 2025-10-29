@@ -35,7 +35,7 @@ function ClienteRest() {
                     $.cookie("nick", data.nick);
                     //ws.email=data.nick;
                     cw.limpiar();
-                    cw.mostrarHome();
+                    cw.mostrarHome(data.nick);
                     //cw.mostrarMsg("Bienvenido al sistema,"+data.nick);
                     //cw.mostrarLogin();
                 }

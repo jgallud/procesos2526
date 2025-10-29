@@ -27,8 +27,9 @@ Este primer sprint se estructura en 7 bloques:
 6. Implementar el componente de visualización
 7. Desplegar el prototipo
 
-Duración del sprint: 4 semanas
-Estimación en SP: 35
+Datos del sprint:
+- Duración del sprint: 4 semanas
+- Estimación en SP: 35
 
 ## Sprint 2. Gestión de usuarios y autenticación
 El sprint 2 tiene por objetivo la gestión de usuarios locales y con OAuth. Antes de abordar esas cuestiones, se plantea la problemática de la gestión del estado (LocalStorage y Cookies).
@@ -41,5 +42,6 @@ Los bloques del sprint 2 son los siguientes:
 5. Implementar registro de usuarios locales
 6. Implementar inicio de sesión de usuarios locales
 
-Duración del sprint: 4 semanas
-Estimación en SP: 33
+Datos del sprint:
+- Duración del sprint: 4 semanas
+- Estimación en SP: 33

@@ -20,6 +20,28 @@ function Sistema() {
       }
     });
   }
+  this.loginUsuario = function (obj, callback) {
+        let modelo = this;
+
+        this.cad.buscarUsuario({ email: obj.email }, function (usr) {
+            if (!usr) {
+                //modelo.cad.insertarUsuario(obj, function (res) {
+                callback({ "email": -1 });
+                //});
+            }
+            else {
+                //bcrypt.compare(obj.password, usr.password, function (err, result) {
+                    if (obj.password == usr.password) {
+                        callback({ "email": usr.email });
+                        modelo.agregarUsuario(usr.email);
+                    }
+                    else {
+                        callback({ "email": -1 });
+                    }
+                //})
+            }
+        });
+    }
   this.usuarioGoogle = function (usr, callback) {
     let modelo = this;
     this.cad.buscarOCrearUsuario(usr, function (obj) {
