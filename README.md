@@ -16,10 +16,10 @@ Para que funcione OAuth de Goole hay que definir unas credenciales en la consola
 Para que funcione la capa de acceso a datos se debe definir una cadena de conexión (a Monto Atlas o local).
 Esas cadenas se pueden incluir en un archivo .env con las siguientes variables de entorno: clientID, secretID, url y connectionString.
 Una vez realizado esas operaciones, ejecutar los siguientes comandos:
-'''
+```
 npm i
 npm run dev
-'''
+```
 
 Con ese mismo código se puede implementar integración continúa definiendo esas variables de entorno en el despliegue correspondiente. En el curso utilizamos integración continúa basada en GitHub conectado a un servicio de Cloud Run de GCP.
 
