@@ -83,6 +83,17 @@ app.post("/registrarUsuario", function (request, response) {
     });
 });
 
+app.get("/confirmarUsuario/:email/:key", function (request, response) {
+    let email = request.params.email;
+    let key = request.params.key;
+    sistema.confirmarUsuario({ "email": email, "key": key }, function (usr) {
+        if (usr.email != -1) {
+            response.cookie('nick', usr.email);
+        }
+        response.redirect('/');
+    });
+})
+
 app.post('/loginUsuario', passport.authenticate("local", { failureRedirect: "/fallo", successRedirect: "/ok" })
 );
 
