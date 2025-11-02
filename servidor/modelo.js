@@ -1,4 +1,6 @@
 const datos = require("./cad.js");
+const correo=require("./email.js");
+
 
 function Sistema() {
   this.usuarios = {};
@@ -11,9 +13,12 @@ function Sistema() {
     }
     this.cad.buscarUsuario(obj, function (usr) {
       if (!usr) {
+        obj.key = Date.now().toString();
+        obj.confirmada = false;
         modelo.cad.insertarUsuario(obj, function (res) {
           callback(res);
         });
+        correo.enviarEmail(obj.email, obj.key,"Confirmar cuenta");
       }
       else {
         callback({ "email": -1 });

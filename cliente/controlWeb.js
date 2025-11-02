@@ -23,7 +23,7 @@ function ControlWeb() {
             });
         });
     }
-     this.mostrarLogin = function () {
+    this.mostrarLogin = function () {
         this.limpiar();
         $("#registro").load("./cliente/login.html", function () {
             $('#btnGS').load("./cliente/botonGS.html");
@@ -35,6 +35,10 @@ function ControlWeb() {
                     rest.loginUsuario(email, pwd);
                     console.log(email + " " + pwd);
                 }
+            });
+            $("#btnRegistro").on("click", function (e) {
+                e.preventDefault();
+                cw.mostrarRegistro();
             });
         });
     }
