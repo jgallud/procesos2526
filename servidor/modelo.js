@@ -1,6 +1,6 @@
 const datos = require("./cad.js");
 const correo = require("./email.js");
-
+const bcrypt = require("bcrypt");
 
 function Sistema() {
   this.usuarios = {};
@@ -11,10 +11,12 @@ function Sistema() {
     if (!obj.nick) {
       obj.nick = obj.email;
     }
-    this.cad.buscarUsuario(obj, function (usr) {
+    this.cad.buscarUsuario(obj, async function (usr) {
       if (!usr) {
         obj.key = Date.now().toString();
         obj.confirmada = false;
+        const hash = await bcrypt.hash(obj.password, 10);
+        obj.password = hash;
         modelo.cad.insertarUsuario(obj, function (res) {
           callback(res);
         });
@@ -52,15 +54,15 @@ this.loginUsuario = function (obj, callback) {
       //});
     }
     else {
-      //bcrypt.compare(obj.password, usr.password, function (err, result) {
-      if (obj.password == usr.password) {
-        callback({ "email": usr.email });
-        modelo.agregarUsuario(usr.email);
-      }
-      else {
-        callback({ "email": -1 });
-      }
-      //})
+      bcrypt.compare(obj.password, usr.password, function (err, result) {
+        if (obj.password == usr.password) {
+          callback({ "email": usr.email });
+          modelo.agregarUsuario(usr.email);
+        }
+        else {
+          callback({ "email": -1 });
+        }
+      })
     }
   });
 }
