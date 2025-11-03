@@ -6,6 +6,7 @@ let options = {};
 options.clientID = process.env.clientID;
 options.secretID = process.env.secretID;
 options.url = process.env.url;
+
 passport.serializeUser(function (user, done) {
     done(null, user);
 });
