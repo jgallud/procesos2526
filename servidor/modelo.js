@@ -55,7 +55,7 @@ this.loginUsuario = function (obj, callback) {
     }
     else {
       bcrypt.compare(obj.password, usr.password, function (err, result) {
-        if (obj.password == usr.password) {
+        if (result) {
           callback({ "email": usr.email });
           modelo.agregarUsuario(usr.email);
         }
