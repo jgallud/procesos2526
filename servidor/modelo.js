@@ -9,9 +9,9 @@ function Sistema(test) {
   this.registrarUsuario = function (obj, callback) {
     let modelo = this;
     if (!obj.nick) {
-      obj.nick = obj.email;
+      obj.nick = obj.email.split("@")[0];;
     }
-    this.cad.buscarUsuario(obj, async function (usr) {
+    this.cad.buscarUsuario({email:obj.email}, async function (usr) {
       if (!usr) {
         obj.key = Date.now().toString();
         obj.confirmada = false;

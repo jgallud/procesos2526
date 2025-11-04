@@ -14,6 +14,18 @@ function CAD() {
         insertar(this.usuarios, usuario, callback);
     }
 
+    // async function buscar(coleccion, criterio) {
+    // try {
+    //     const usuarios = await coleccion.find(criterio).toArray();
+    //     if (usuarios.length === 0) {
+    //         return undefined;
+    //     } else {
+    //         return usuarios[0];
+    //     }
+    // } catch (error) {
+    //     throw error; // Puedes manejarlo aquí o dejar que se propague
+    // }
+    // }
     function buscar(coleccion, criterio, callback) {
         coleccion.find(criterio).toArray(function (error, usuarios) {
             if (usuarios.length == 0) {
