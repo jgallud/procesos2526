@@ -40,7 +40,7 @@ const haIniciado = function (request, response, next) {
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
 
-    let sistema = new modelo.Sistema();
+    let sistema = new modelo.Sistema({test:false});
 
     app.get("/", function (request, response) {
         var contenido = fs.readFileSync(__dirname + "/cliente/index.html");

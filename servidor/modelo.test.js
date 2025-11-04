@@ -2,13 +2,13 @@ const modelo = require("./modelo.js");
 describe('El sistema...', function() {
     let sistema;
     beforeEach(function() {
-        sistema=new modelo.Sistema();
+        sistema=new modelo.Sistema({test:true});
     });
 
     it('...puede agregar un usuario', function() {
         sistema.agregarUsuario("pepe");
         let usuarios=sistema.obtenerUsuarios();
-        expect(usuarios["pepe"].nick).toBe("pepe");
+        expect(usuarios[0].nick).toBe("pepe");
     });
     it('...puede verificar si un usuario está activo', function() {
         sistema.agregarUsuario("pepe");

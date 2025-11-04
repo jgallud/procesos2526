@@ -17,15 +17,14 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --env-file .env index.js",
-    "testW": "node_modules\\.bin\\jasmine-node servidor",
-    "test": "./node_modules/.bin/jasmine-node servidor"
+    "test": "jest"
   },
   "dependencies": {
     "@getbrevo/brevo": "^3.0.1",
     "bcrypt": "^6.0.0",
     "cookie-session": "^2.1.1",
     "express": "^5.1.0",
-    "jasmine-node": "^3.0.0",
+    "jest": "^30.2.0",
     "mongodb": "4.4.0",
     "passport": "^0.5.3",
     "passport-google-oauth20": "^2.0.0",

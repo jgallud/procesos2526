@@ -2,7 +2,7 @@ const datos = require("./cad.js");
 const correo = require("./email.js");
 const bcrypt = require("bcrypt");
 
-function Sistema() {
+function Sistema(test) {
   this.usuarios = {};
   this.cad = new datos.CAD();
 
@@ -113,10 +113,12 @@ this.numeroUsuarios = function () {
   return Object.keys(this.usuarios).length;
 }
 
-this.cad.conectar(function (db) {
-  console.log("Conectado a Mongo Atlas");
-  // Aquí puedes realizar operaciones con la base de datos
-});
+if (!test.test){
+  this.cad.conectar(function (db) {
+    console.log("Conectado a Mongo Atlas");
+    // Aquí puedes realizar operaciones con la base de datos
+  });
+}
 }
 
 function Usuario(nick) {
