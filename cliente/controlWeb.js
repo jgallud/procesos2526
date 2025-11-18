@@ -17,7 +17,7 @@ function ControlWeb() {
                 let email = $("#email").val();
                 let pwd = $("#pwd").val();
                 if (email && pwd) {
-                    rest.registrarUsuario(email,pwd);
+                    rest.registrarUsuario(email, pwd);
                     console.log(email + " " + pwd);
                 }
             });
@@ -76,12 +76,21 @@ function ControlWeb() {
         $.removeCookie("nick");
         location.reload();
     }
-     this.limpiar = function () {
+
+    this.limpiar = function () {
         $("#txt").remove();
         $('#mAU').remove();
         $('#mH').remove();
         $("#fmLogin").remove();
         $("#fmRegistro").remove();
     }
-
+    this.mostrarModal = function (m) {
+        $("#msg").remove();
+        let cadena = "<div id='msg'>" + m + "</div>";
+        $('#mBody').append(cadena);
+        $('#miModal').modal();
+        $('#btnModal').on('click',function(){
+            $('#miModal').modal('hide');
+        })
+    }
 }

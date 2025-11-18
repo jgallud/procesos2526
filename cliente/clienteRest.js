@@ -14,7 +14,7 @@ function ClienteRest() {
                 }
                 else {
                     console.log("El nick está ocupado");
-                    //cw.mostrarModal("El nick está ocupado");
+                    cw.mostrarModal("El nick está ocupado");
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
