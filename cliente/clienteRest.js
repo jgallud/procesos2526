@@ -90,4 +90,12 @@ function ClienteRest() {
         });
     };
 
+  this.obtenerListaPartidasDisponibles=function(){
+		let cli=this;
+		$.getJSON("/obtenerPartidasDisponibles",function(lista){
+			console.log(lista);
+			cw.mostrarListaPartidas(lista);
+		});
+	}  
+
 }

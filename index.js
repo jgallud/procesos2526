@@ -144,6 +144,11 @@ app.get("/usuarioActivo/:nick", function (request, response) {
     response.send({ "activo": res });
 });
 
+app.get("/obtenerPartidasDisponibles",function(request,response){
+  let lista=sistema.obtenerPartidasDisponibles();
+  response.send(lista);
+});
+
 // app.listen(PORT, () => {
 //     console.log(`App está escuchando en el puerto ${PORT}`);
 //     console.log('Ctrl+C para salir');
