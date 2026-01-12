@@ -84,7 +84,7 @@ function Sistema(test) {
       res.nick = nick;
     }
     else {
-      console.log("el nick " + nick + " está en uso");
+      console.log("el nick " + nick + " ya está activo");
     }
     return res;
   }
@@ -134,7 +134,7 @@ function Sistema(test) {
     let res = false;
     let partida = this.partidas[codigo];
     if (usr && partida) {
-      res = partida.asignarJugador(usr);
+      res = partida.asignarJugador(usr,"black");
       //return res;
     }
     return res;
@@ -188,6 +188,7 @@ function Sistema(test) {
     let codigo = datos.codigo;
     let email = datos.email;  
     console.log("Jugador "+email+" abandona la partida "+codigo);
+    this.eliminarPartida(email, codigo);
   }
 
   if (!test.test) {
@@ -203,22 +204,31 @@ function Partida(codigo, owner) {
   this.owner = owner;
   this.jugadores = [];
   this.maxJug = 2;
-  this.asignarJugador = function (usr) {
+  this.turno = "white";
+  this.listaCompleta=false;
+  this.tablero = Array(9).fill(null).map(() => Array(9).fill(0));
+  this.asignarJugador = function (usr, color) {
     if (this.jugadores.length >= this.maxJug) {
       return false;
     }
     console.log("Asignando jugador " + usr.nick + " a la partida " + this.codigo);
-    this.jugadores.push(usr);
+    usr.color = color;
+    this.jugadores[usr.email] = usr;
+    if (Object.keys(this.jugadores).length === this.maxJug) {
+      this.listaCompleta = true;
+    }
     return true;
   }
   this.partidaDisponible = function () {
     return this.jugadores.length < this.maxJug;
   }
-  this.asignarJugador(this.owner);
+  this.asignarJugador(this.owner,"white");
 }
 
-function Usuario(nick) {
+function Usuario(nick,color) {
   this.nick = nick;
+  this.email = nick;
+  this.color=color;
 }
 
 module.exports.Sistema = Sistema;

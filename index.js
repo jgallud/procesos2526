@@ -15,6 +15,15 @@ const bodyParser = require("body-parser");
 const modelo = require("./servidor/modelo.js");
 const PORT = process.env.PORT || 3000;
 
+// Instala el paquete cors: npm install cors
+const cors = require('cors');
+app.use(cors({
+  origin: 'http://localhost:4000', // El puerto de tu nuevo Next.js
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.static(__dirname + "/"));
 
 app.use(cookieSession({
@@ -39,7 +48,7 @@ const haIniciado = function (request, response, next) {
         next();
     }
     else {
-        response.redirect("/")
+        response.redirect('http://localhost:4000/');
     }
 }
 
@@ -48,12 +57,12 @@ app.use(bodyParser.json());
 
 let sistema = new modelo.Sistema({ test: false });
 
-app.get("/", function (request, response) {
-    var contenido = fs.readFileSync(__dirname + "/cliente/index.html");
-    response.setHeader("Content-type", "text/html");
-    response.send(contenido);
+// app.get("/", function (request, response) {
+//     var contenido = fs.readFileSync(__dirname + "/cliente/index.html");
+//     response.setHeader("Content-type", "text/html");
+//     response.send(contenido);
 
-});
+// });
 
 app.get("/auth/google", passport.authenticate('google', { scope: ['profile', 'email'] }));
 
@@ -83,8 +92,21 @@ app.post('/oneTap/callback',
 app.get("/good", function (request, response) {
     let email = request.user.emails[0].value;
     sistema.usuarioGoogle({ "email": email }, function (obj) {
-        response.cookie('nick', obj.email);
-        response.redirect('/');
+    //     response.cookie('nick', obj.email);
+    //     response.redirect('/');
+    // });
+    console.log(request.user.emails[0].value);
+    // 1. Configuración de la cookie para que sea accesible desde el nuevo puerto
+        response.cookie('nick', obj.email, {
+            httpOnly: false, // Cámbialo a true si solo quieres que el servidor la lea
+            secure: false,   // false porque estás en localhost
+            sameSite: 'lax',
+            path: '/'
+        });
+
+        // 2. REDIRECCIÓN CLAVE: Enviar al usuario de vuelta a Next.js (puerto 3001)
+        // Puedes redirigirlo al dashboard o a una página de éxito
+        response.redirect('http://localhost:4000/dashboard');
     });
 });
 
@@ -98,23 +120,227 @@ app.post("/registrarUsuario", function (request, response) {
     });
 });
 
+// app.get("/confirmarUsuario/:email/:key", function (request, response) {
+//     let email = request.params.email;
+//     let key = request.params.key;
+//     sistema.confirmarUsuario({ "email": email, "key": key }, function (usr) {
+//         if (usr.email != -1) {
+//             response.cookie('nick', usr.email);
+//         }
+//         response.redirect('/');
+//     });
+// })
+
 app.get("/confirmarUsuario/:email/:key", function (request, response) {
     let email = request.params.email;
     let key = request.params.key;
+
     sistema.confirmarUsuario({ "email": email, "key": key }, function (usr) {
         if (usr.email != -1) {
-            response.cookie('nick', usr.email);
-        }
-        response.redirect('/');
-    });
-})
+            // 1. Configuramos la cookie con los parámetros necesarios para Cross-Origin
+            response.cookie('nick', usr.email, {
+                httpOnly: false, // Permitir que el frontend la lea si es necesario
+                secure: false,   // false mientras estés en desarrollo (http)
+                sameSite: 'lax', // Necesario para que la cookie se mantenga tras el redirect
+                path: '/'        // Disponible en toda la aplicación
+            });
 
-app.post('/loginUsuario', passport.authenticate("local", { failureRedirect: "/fallo", successRedirect: "/ok" })
-);
+            // 2. Redirigimos al Dashboard del nuevo Frontend (puerto 3001)
+            response.redirect('http://localhost:4000/dashboard');
+        } else {
+            // 3. Si la confirmación falla, podrías redirigir al login con un error
+            response.redirect('http://localhost:4000/?error=confirmacion_fallida');
+        }
+    });
+});
+
+// app.post('/loginUsuario', passport.authenticate("local", { failureRedirect: "/fallo", successRedirect: "/ok" })
+// );
+
+app.post('/loginUsuario', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) return next(err);
+    
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Usuario o contraseña incorrectos" });
+    }
+
+    // Iniciamos la sesión manualmente
+    req.logIn(user, function(err) {
+      if (err) return next(err);
+      
+      // IMPORTANTE: Aquí establecemos tu cookie 'nick'
+      res.cookie('nick', user.email, {
+        httpOnly: false, // Para que el front pueda leerla
+        secure: false,   // false en localhost
+        sameSite: 'lax',
+        path: '/'
+      });
+
+      // RESPONDEMOS JSON, NO REDIRIGIMOS
+      return res.status(200).json({ 
+        success: true, 
+        message: "Login exitoso",
+        user: user.email 
+      });
+    });
+  })(req, res, next);
+});
 
 app.get("/ok", function (request, response) {
-    response.send({ nick: request.user.email })
+    //response.send({ nick: request.user.email })
+    // response.cookie('nick', request.user.email, {
+    //         httpOnly: false, // Cámbialo a true si solo quieres que el servidor la lea
+    //         secure: false,   // false porque estás en localhost
+    //         sameSite: 'lax',
+    //         maxAge: 24 * 60 * 60 * 1000 // 24 horas por ejemplo
+    //     });
+    response.redirect('http://localhost:4000/dashboard');
 });
+
+app.get("/verificarSesion", function(req, res) {
+    // Passport añade esta función automáticamente
+    if (req.isAuthenticated && req.isAuthenticated()) {
+        return res.status(200).json({ 
+            autenticado: true, 
+            user: req.user.email 
+        });
+    } else {
+        return res.status(401).json({ 
+            autenticado: false, 
+            message: "No hay sesión activa" 
+        });
+    }
+});
+
+// Ruta en tu servidor Express (Puerto 3000)
+app.get('/dashboard', (req, res) => {
+    // Verificamos si Passport tiene al usuario autenticado
+    res.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.header('Pragma', 'no-cache');
+    res.header('Expires', '0');
+    if (req.isAuthenticated()) {
+        res.json({ 
+            auth: true, 
+            user: req.user 
+        });
+    } else {
+        // IMPORTANTE: Enviamos 401 para que el Front sepa que debe redirigir
+        res.status(401).json({ auth: false, message: "Sesión expirada o no iniciada" });
+    }
+});
+
+// app.post("/cerrarSesion", function (request, response) {
+//     console.log("--> Backend: Iniciando proceso de salida");
+
+//     // 1. Limpiamos las cookies del lado del servidor de inmediato
+//     response.clearCookie('connect.sid', { path: '/' });
+//     response.clearCookie('nick', { path: '/' });
+//     sistema.eliminarUsuario(request.user ? request.user.email : null);
+//     console.log("--> Backend: Cookies limpiadas.");
+//     // 2. Respondemos al cliente YA para que no se quede en 'pending'
+//     response.status(200).json({ status: "ok" });
+
+//     // 3. De forma asíncrona (en segundo plano), limpiamos Passport
+//     if (request.logout) {
+//         request.logout(function(err) {
+//             if (request.session) {
+//                 request.session.destroy();
+//             }
+//             console.log("--> Backend: Sesión de Passport finalizada en segundo plano.");
+//         });
+//     }
+// });
+
+app.post("/cerrarSesion", function (request, response) {
+    console.log("--> Backend: Intentando cerrar sesión segura...");
+
+    const nick = (request.user ? request.user.email : null) || 
+                 (request.session ? request.session.nick : null) || 
+                 (request.cookies ? request.cookies.nick : null);
+
+    console.log("Nick localizado para eliminar:", nick);
+
+    if (nick) {
+        try {
+            console.log(`Eliminando a ${nick} de la colección de lógica...`);
+            sistema.eliminarUsuario(nick); 
+        } catch (error) {
+            console.log("Error al eliminar usuario de la lógica:", error);
+            // Seguimos adelante para que el usuario pueda salir de todos modos
+        }
+    }
+    // 1. Limpiar Passport (si existe)
+    if (request.logout) {
+        try {
+            request.logout(() => {}); 
+        } catch (e) {
+            console.log("Logout síncrono");
+        }
+    }
+    sistema.eliminarUsuario(request.user ? request.user.email : null);
+    // 2. Limpiar la sesión con seguridad
+    if (request.session && typeof request.session.destroy === 'function') {
+        request.session.destroy((err) => {
+            if (err) console.log("Error al destruir sesión:", err);
+            enviarRespuestaFinal(response);
+        });
+    } else {
+        // Si no hay sesión o no hay función destroy, no pasa nada
+        console.log("No había sesión activa o la función destroy no existe");
+        enviarRespuestaFinal(response);
+    }
+});
+
+// Función auxiliar para no repetir código
+function enviarRespuestaFinal(response) {
+    response.clearCookie('connect.sid', { path: '/', domain: 'localhost' });
+    response.clearCookie('nick', { path: '/', domain: 'localhost' });
+    console.log("--> Backend: Respuesta enviada con éxito.");
+    return response.status(200).json({ status: "ok" });
+}
+// app.post("/cerrarSesion", function (request, response) {
+//     console.log("--> Backend: Forzando cierre de sesión...");
+
+//     // 1. Borramos el rastro en Passport de forma síncrona
+//     // En muchas versiones, esto limpia req.user inmediatamente
+//     if (typeof request.logout === 'function') {
+//         try {
+//             // Intentamos la versión con callback por si acaso
+//             request.logout(() => {}); 
+//         } catch (e) {
+//             // Si falla (versión vieja), probamos síncrono
+//             request.logout();
+//         }
+//     }
+
+//     // 2. MATAR LA SESIÓN MANUALMENTE
+//     // No esperamos al callback de destroy, simplemente sobrescribimos la sesión
+//     if (request.session) {
+//         request.session.destroy((err) => {
+//             if (err) console.log("Error destruyendo sesión, pero seguimos...");
+            
+//             // 3. LIMPIEZA DE COOKIES Y RESPUESTA
+//             // Usamos nombres de cookies comunes, asegúrate de que coincidan con las tuyas
+//             response.clearCookie('connect.sid', { path: '/', domain: 'localhost' });
+//             response.clearCookie('nick', { path: '/', domain: 'localhost' });
+            
+//             console.log("--> Backend: Todo limpio. Enviando respuesta al Front.");
+//             return response.status(200).json({ status: "ok" });
+//         });
+//     } else {
+//         // Si ni siquiera hay objeto sesión, respondemos OK igual
+//         return response.status(200).json({ status: "ok" });
+//     }
+// });
+
+// // Función auxiliar para asegurar que el Front reciba el OK y no se quede "Pending"
+// function finalizarRespuesta(response) {
+//     response.clearCookie('connect.sid', { path: '/' });
+//     response.clearCookie('nick', { path: '/' });
+//     console.log("Respuesta enviada al cliente.");
+//     return response.status(200).json({ status: "ok" });
+// }
 
 app.get("/agregarUsuario/:nick", function (request, response) {
     let nick = request.params.nick;

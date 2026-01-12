@@ -9,38 +9,47 @@ function ServidorWS(io) {
     // this.enviarGlobal = function (io, mens, datos) {
     //     io.emit(mens, datos);
     // }
-    this.enviarATodosEnPartida=function(io,codigo,mensaje,datos){
-		io.to(codigo).emit(mensaje,datos);
-	}
-    this.enviarATodos=function(socket,mens,datos){
-    	socket.broadcast.emit(mens,datos);
+    this.enviarATodosEnPartida = function (io, codigo, mensaje, datos) {
+        io.to(codigo).emit(mensaje, datos);
     }
-    this.enviarATodosEnPartidaExceptoRemitente=function(socket,codigo,mensaje,datos){
-		socket.broadcast.to(codigo).emit(mensaje, datos);
-	}
+    this.enviarATodos = function (socket, mens, datos) {
+        socket.broadcast.emit(mens, datos);
+    }
+    this.enviarATodosEnPartidaExceptoRemitente = function (socket, codigo, mensaje, datos) {
+        socket.broadcast.to(codigo).emit(mensaje, datos);
+    }
     this.lanzarServidor = function (io, sistema) {
         let srv = this;
         io.on('connection', function (socket) {
             console.log("Capa WS activa");
+            let lista = sistema.obtenerPartidasDisponibles();
+            console.log(lista);
+            srv.enviarATodos(socket, "actualizarListaPartidas", lista);
             socket.on("crearPartida", function (datos) {
                 let codigo = sistema.crearPartida(datos.email);
                 if (codigo != -1) {
                     socket.join(codigo);
                     console.log("Partida creada con código: " + codigo);
-                    srv.enviarAlRemitente(socket, "partidaCreada", { "codigo": codigo });
+                    const partida = sistema.partidas[codigo];
+                    const jugador = partida.jugadores[datos.email];
+                    //console.log(jugador);
+                    srv.enviarAlRemitente(socket, "partidaCreada", { "codigo": codigo,"color": jugador.color });
                 }
                 let lista = sistema.obtenerPartidasDisponibles();
-                console.log(lista);
+                //console.log(lista);
                 srv.enviarATodos(socket, "actualizarListaPartidas", lista);
             });
             socket.on("unirAPartida", function (datos) {
                 // pedir a sistema unir a partida
                 let res = sistema.unirAPartida(datos.email, datos.codigo);
+                const partida = sistema.partidas[datos.codigo];
+                const jugador = partida.jugadores[datos.email];
                 if (res) {
                     socket.join(datos.codigo);
-                    srv.enviarAlRemitente(socket, "unidoAPartida", { "codigo": datos.codigo });
-                    srv.enviarATodosEnPartida(socket, datos.codigo, "iniciarPartida", { "email": datos.email });
-
+                    srv.enviarAlRemitente(socket, "unidoAPartida", { "codigo": datos.codigo,"color": jugador.color});
+                    srv.enviarATodosEnPartida(io, datos.codigo, "iniciarPartida", 
+                        { "email": datos.email,tablero: partida.tablero, turno: partida.turno });
+                    partida.enCurso = true;
                 }
                 else {
                     srv.enviarAlRemitente(socket, "noUnidoAPartida", {});
@@ -48,14 +57,53 @@ function ServidorWS(io) {
                 let lista = sistema.obtenerPartidasDisponibles();
                 srv.enviarATodos(socket, "actualizarListaPartidas", lista);
             });
+            socket.on("colocarPiedra", (data) => {
+                const partida = sistema.partidas[data.codigo]; // tu mapa de partidas
+
+                if (!partida || !partida.enCurso) return;
+                const jugador=partida.jugadores[data.email];
+                //const jugador = partida.jugadores.black === socket.id ? "black" : "white";
+
+                if (jugador.color !== partida.turno) {
+                    return socket.emit("jugadaInvalida", "No es tu turno");
+                }
+
+                if (partida.tablero[data.y][data.x] !== 0) {
+                    return socket.emit("jugadaInvalida", "Casilla ocupada");
+                }
+
+                // Coloca piedra
+                partida.tablero[data.y][data.x] = jugador.color === "black" ? 1 : 2;
+
+                // Aquí podrías llamar a la función de capturas (más adelante)
+
+                // Cambiar turno
+                partida.turno = jugador.color === "black" ? "white" : "black";
+
+                // Emitir tablero actualizado a ambos jugadores
+                srv.enviarATodosEnPartida(io, data.codigo, "jugadaRealizada", {
+                    tablero: partida.tablero,
+                    turno: partida.turno
+                });
+                // for (const id of Object.values(partida.jugadores)) {
+                //     io.to(id).emit("estadoPartida", {
+                //         tablero: partida.tablero,
+                //         turno: partida.turno
+                //     });
+                // }
+            });
+
             socket.on("abandonarPartida", function (datos) {
                 let codigoStr = datos.codigo.toString();
+                srv.enviarATodosEnPartida(io, datos.codigo, "partidaAbandonada", { "id": socket.id });
                 sistema.jugadorAbandona(datos);
                 //cli.enviarATodosEnPartida(io,codigoStr,"jugadorAbandona",{"nick":nick});
                 let lista = sistema.obtenerPartidasDisponibles();
                 srv.enviarATodos(socket, "actualizarListaPartidas", lista);
-                srv.enviarATodosEnPartidaExceptoRemitente(socket, codigoStr, "jugadorAbandona", { "email": datos.email });
+                //srv.enviarATodosEnPartidaExceptoRemitente(socket, codigoStr, "jugadorAbandona", { "email": datos.email });
                 //cli.enviarATodos(socket,"jugadorAbandona",{"nick":nick});
+
+
                 socket.leave(codigoStr);
             });
         });
