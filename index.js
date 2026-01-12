@@ -18,10 +18,10 @@ const url = process.env.url_front || "http://localhost:4000";
 // Instala el paquete cors: npm install cors
 const cors = require('cors');
 app.use(cors({
-  origin: url, // El puerto de tu nuevo Next.js
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
+    origin: url, // El puerto de tu nuevo Next.js
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.static(__dirname + "/"));
@@ -92,12 +92,12 @@ app.post('/oneTap/callback',
 app.get("/good", function (request, response) {
     let email = request.user.emails[0].value;
     sistema.usuarioGoogle({ "email": email }, function (obj) {
-    //     response.cookie('nick', obj.email);
-    //     response.redirect('/');
-    // });
-    console.log(request.user.emails[0].value);
-    // 1. Configuración de la cookie para que sea accesible desde el nuevo puerto
-        response.cookie('nick', obj.email, {
+        //     response.cookie('nick', obj.email);
+        //     response.redirect('/');
+        // });
+        console.log(request.user.emails[0].value);
+        // 1. Configuración de la cookie para que sea accesible desde el nuevo puerto
+        response.cookie('email', obj.email, {
             httpOnly: false, // Cámbialo a true si solo quieres que el servidor la lea
             secure: false,   // false porque estás en localhost
             sameSite: 'lax',
@@ -116,7 +116,7 @@ app.get("/fallo", function (request, response) {
 
 app.post("/registrarUsuario", function (request, response) {
     sistema.registrarUsuario(request.body, function (res) {
-        response.send({ "nick": res.email });
+        response.send({ "email": res.email });
     });
 });
 
@@ -138,7 +138,7 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
     sistema.confirmarUsuario({ "email": email, "key": key }, function (usr) {
         if (usr.email != -1) {
             // 1. Configuramos la cookie con los parámetros necesarios para Cross-Origin
-            response.cookie('nick', usr.email, {
+            response.cookie('email', usr.email, {
                 httpOnly: false, // Permitir que el frontend la lea si es necesario
                 secure: false,   // false mientras estés en desarrollo (http)
                 sameSite: 'lax', // Necesario para que la cookie se mantenga tras el redirect
@@ -157,35 +157,56 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
 // app.post('/loginUsuario', passport.authenticate("local", { failureRedirect: "/fallo", successRedirect: "/ok" })
 // );
 
-app.post('/loginUsuario', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-    if (err) return next(err);
-    
-    if (!user) {
-      return res.status(401).json({ success: false, message: "Usuario o contraseña incorrectos" });
-    }
+// app.post('/loginUsuario', function (req, res, next) {
+//     passport.authenticate('local', function (err, user, info) {
+//         if (err) return next(err);
 
-    // Iniciamos la sesión manualmente
-    req.logIn(user, function(err) {
-      if (err) return next(err);
-      
-      // IMPORTANTE: Aquí establecemos tu cookie 'nick'
-      res.cookie('nick', user.email, {
-        httpOnly: false, // Para que el front pueda leerla
-        secure: false,   // false en localhost
-        sameSite: 'lax',
-        path: '/'
-      });
+//         if (!user) {
+//             return res.status(401).json({ success: false, message: "Usuario o contraseña incorrectos" });
+//         }
 
-      // RESPONDEMOS JSON, NO REDIRIGIMOS
-      return res.status(200).json({ 
-        success: true, 
-        message: "Login exitoso",
-        user: user.email 
-      });
+//         // Iniciamos la sesión manualmente
+//         req.logIn(user, function (err) {
+//             if (err) return next(err);
+
+//             // IMPORTANTE: Aquí establecemos tu cookie 'nick'
+//             res.cookie('email', user.email, {
+//                 httpOnly: false, // Para que el front pueda leerla
+//                 secure: false,   // false en localhost
+//                 sameSite: 'lax',
+//                 path: '/'
+//             });
+
+//             // RESPONDEMOS JSON, NO REDIRIGIMOS
+//             return res.status(200).json({
+//                 success: true,
+//                 message: "Login exitoso",
+//                 user: {email: user.email}
+//             });
+//         });
+//     })(req, res, next);
+// });
+
+// Ejemplo en Express
+app.post("/loginUsuario", function (req, res) {
+    const { email, password } = req.body;
+
+    sistema.loginUsuario({ "email": email, "password": password }, function (usuarioValido) {
+        if (!usuarioValido) return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
+
+        // Poner cookie igual que Google
+        res.cookie('email', email, {
+            httpOnly: false, // puedes poner true si quieres que solo el servidor la lea
+            secure: false,   // false en local, true en producción HTTPS
+            sameSite: 'lax',
+            path: '/'
+        });
+
+        // Redirigir al dashboard o devolver JSON
+        return res.status(200).json({ ok: true });
     });
-  })(req, res, next);
 });
+
 
 app.get("/ok", function (request, response) {
     //response.send({ nick: request.user.email })
@@ -198,17 +219,17 @@ app.get("/ok", function (request, response) {
     response.redirect(url + '/dashboard');
 });
 
-app.get("/verificarSesion", function(req, res) {
+app.get("/verificarSesion", function (req, res) {
     // Passport añade esta función automáticamente
     if (req.isAuthenticated && req.isAuthenticated()) {
-        return res.status(200).json({ 
-            autenticado: true, 
-            user: req.user.email 
+        return res.status(200).json({
+            autenticado: true,
+            user: { email: req.user.email }
         });
     } else {
-        return res.status(401).json({ 
-            autenticado: false, 
-            message: "No hay sesión activa" 
+        return res.status(401).json({
+            autenticado: false,
+            message: "No hay sesión activa"
         });
     }
 });
@@ -220,9 +241,9 @@ app.get('/dashboard', (req, res) => {
     res.header('Pragma', 'no-cache');
     res.header('Expires', '0');
     if (req.isAuthenticated()) {
-        res.json({ 
-            auth: true, 
-            user: req.user 
+        res.json({
+            auth: true,
+            user: req.user
         });
     } else {
         // IMPORTANTE: Enviamos 401 para que el Front sepa que debe redirigir
@@ -255,16 +276,16 @@ app.get('/dashboard', (req, res) => {
 app.post("/cerrarSesion", function (request, response) {
     console.log("--> Backend: Intentando cerrar sesión segura...");
 
-    const nick = (request.user ? request.user.email : null) || 
-                 (request.session ? request.session.nick : null) || 
-                 (request.cookies ? request.cookies.nick : null);
+    const nick = (request.user ? request.user.email : null) ||
+        (request.session ? request.session.nick : null) ||
+        (request.cookies ? request.cookies.nick : null);
 
     console.log("Nick localizado para eliminar:", nick);
 
     if (nick) {
         try {
             console.log(`Eliminando a ${nick} de la colección de lógica...`);
-            sistema.eliminarUsuario(nick); 
+            sistema.eliminarUsuario(nick);
         } catch (error) {
             console.log("Error al eliminar usuario de la lógica:", error);
             // Seguimos adelante para que el usuario pueda salir de todos modos
@@ -273,7 +294,7 @@ app.post("/cerrarSesion", function (request, response) {
     // 1. Limpiar Passport (si existe)
     if (request.logout) {
         try {
-            request.logout(() => {}); 
+            request.logout(() => { });
         } catch (e) {
             console.log("Logout síncrono");
         }
@@ -319,12 +340,12 @@ function enviarRespuestaFinal(response) {
 //     if (request.session) {
 //         request.session.destroy((err) => {
 //             if (err) console.log("Error destruyendo sesión, pero seguimos...");
-            
+
 //             // 3. LIMPIEZA DE COOKIES Y RESPUESTA
 //             // Usamos nombres de cookies comunes, asegúrate de que coincidan con las tuyas
 //             response.clearCookie('connect.sid', { path: '/', domain: 'localhost' });
 //             response.clearCookie('nick', { path: '/', domain: 'localhost' });
-            
+
 //             console.log("--> Backend: Todo limpio. Enviando respuesta al Front.");
 //             return response.status(200).json({ status: "ok" });
 //         });
@@ -370,9 +391,9 @@ app.get("/usuarioActivo/:nick", function (request, response) {
     response.send({ "activo": res });
 });
 
-app.get("/obtenerPartidasDisponibles",function(request,response){
-  let lista=sistema.obtenerPartidasDisponibles();
-  response.send(lista);
+app.get("/obtenerPartidasDisponibles", function (request, response) {
+    let lista = sistema.obtenerPartidasDisponibles();
+    response.send(lista);
 });
 
 // app.listen(PORT, () => {
@@ -384,4 +405,4 @@ httpServer.listen(PORT, () => {
     console.log('Ctrl+C para salir');
 });
 io.listen(httpServer);
-ws.lanzarServidor(io,sistema);
+ws.lanzarServidor(io, sistema);
