@@ -14,11 +14,11 @@ const LocalStrategy = require('passport-local').Strategy;
 const bodyParser = require("body-parser");
 const modelo = require("./servidor/modelo.js");
 const PORT = process.env.PORT || 3000;
-
+const url = process.env.url_front || "http://localhost:4000";
 // Instala el paquete cors: npm install cors
 const cors = require('cors');
 app.use(cors({
-  origin: 'http://localhost:4000', // El puerto de tu nuevo Next.js
+  origin: url, // El puerto de tu nuevo Next.js
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -48,7 +48,7 @@ const haIniciado = function (request, response, next) {
         next();
     }
     else {
-        response.redirect('http://localhost:4000/');
+        response.redirect(url);
     }
 }
 
@@ -106,7 +106,7 @@ app.get("/good", function (request, response) {
 
         // 2. REDIRECCIÓN CLAVE: Enviar al usuario de vuelta a Next.js (puerto 3001)
         // Puedes redirigirlo al dashboard o a una página de éxito
-        response.redirect('http://localhost:4000/dashboard');
+        response.redirect(url + '/dashboard');
     });
 });
 
@@ -146,10 +146,10 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
             });
 
             // 2. Redirigimos al Dashboard del nuevo Frontend (puerto 3001)
-            response.redirect('http://localhost:4000/dashboard');
+            response.redirect(url + '/dashboard');
         } else {
             // 3. Si la confirmación falla, podrías redirigir al login con un error
-            response.redirect('http://localhost:4000/?error=confirmacion_fallida');
+            response.redirect(url + '/?error=confirmacion_fallida');
         }
     });
 });
@@ -195,7 +195,7 @@ app.get("/ok", function (request, response) {
     //         sameSite: 'lax',
     //         maxAge: 24 * 60 * 60 * 1000 // 24 horas por ejemplo
     //     });
-    response.redirect('http://localhost:4000/dashboard');
+    response.redirect(url + '/dashboard');
 });
 
 app.get("/verificarSesion", function(req, res) {
