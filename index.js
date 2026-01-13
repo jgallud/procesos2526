@@ -1,37 +1,45 @@
 const fs = require("fs");
 const express = require('express');
+//const next=require('next');// from 'next';
+const path = require("path");// from "path";
 const passport = require("passport");
 const cookieSession = require("cookie-session");
 require("./servidor/passport-setup.js");
 const app = express();
+//const nextApp = next({ dev:true });
 const httpServer = require('http').Server(app);
 const { Server } = require("socket.io");
 const moduloWS = require("./servidor/servidorWS.js");
 let ws = new moduloWS.ServidorWS();
 let io = new Server();
-
+//const handle = nextApp.getRequestHandler();
 const LocalStrategy = require('passport-local').Strategy;
 const bodyParser = require("body-parser");
 const modelo = require("./servidor/modelo.js");
 const PORT = process.env.PORT || 3000;
-const url = process.env.url_front || "http://localhost:4000";
+const url = process.env.urlConfirmar;
 // Instala el paquete cors: npm install cors
 const cors = require('cors');
-app.use(cors({
-    origin: url, // El puerto de tu nuevo Next.js
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// app.use(cors({
+//     origin: "http://localhost:3000", // El puerto de tu nuevo Next.js
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     credentials: true,
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
 
-app.use(express.static(__dirname + "/"));
-
-app.use(cookieSession({
-    name: 'Sistema',
-    keys: ['key1', 'key2']
-}));
-
+//app.use(express.static(__dirname + "/"));
+app.use(express.static(path.join(__dirname, "cliente")));
 app.use(passport.initialize());
+app.use(cookieSession({
+    name: 'session',
+    keys: ['patata'],
+    maxAge: 24 * 60 * 60 * 1000, // 1 día
+    httpOnly: true,
+    secure: false, // true si estás en HTTPS
+    sameSite: 'lax', // 'none' si front y back están en dominios distintos
+}));
+
+
 app.use(passport.session());
 
 passport.use(new
@@ -56,6 +64,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 let sistema = new modelo.Sistema({ test: false });
+
+
 
 // app.get("/", function (request, response) {
 //     var contenido = fs.readFileSync(__dirname + "/cliente/index.html");
@@ -104,9 +114,7 @@ app.get("/good", function (request, response) {
             path: '/'
         });
 
-        // 2. REDIRECCIÓN CLAVE: Enviar al usuario de vuelta a Next.js (puerto 3001)
-        // Puedes redirigirlo al dashboard o a una página de éxito
-        response.redirect(url + '/dashboard');
+        response.redirect(url + "dashboard.html");
     });
 });
 
@@ -146,7 +154,7 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
             });
 
             // 2. Redirigimos al Dashboard del nuevo Frontend (puerto 3001)
-            response.redirect(url + '/dashboard');
+            response.redirect(url + 'dashboard.html');
         } else {
             // 3. Si la confirmación falla, podrías redirigir al login con un error
             response.redirect(url + '/?error=confirmacion_fallida');
@@ -154,8 +162,8 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
     });
 });
 
-// app.post('/loginUsuario', passport.authenticate("local", { failureRedirect: "/fallo", successRedirect: "/ok" })
-// );
+ app.post('/loginUsuario', passport.authenticate("local", { failureRedirect: "/fallo", successRedirect: "/ok" })
+ );
 
 // app.post('/loginUsuario', function (req, res, next) {
 //     passport.authenticate('local', function (err, user, info) {
@@ -166,8 +174,8 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
 //         }
 
 //         // Iniciamos la sesión manualmente
-//         req.logIn(user, function (err) {
-//             if (err) return next(err);
+//         //req.logIn(user, function (err) {
+//         //    if (err) return next(err);
 
 //             // IMPORTANTE: Aquí establecemos tu cookie 'nick'
 //             res.cookie('email', user.email, {
@@ -183,73 +191,67 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
 //                 message: "Login exitoso",
 //                 user: {email: user.email}
 //             });
-//         });
+//         //});
 //     })(req, res, next);
 // });
 
 // Ejemplo en Express
-app.post("/loginUsuario", function (req, res) {
-    const { email, password } = req.body;
+// app.post("/loginUsuario", function (req, res) {
+//     const { email, password } = req.body;
 
-    sistema.loginUsuario({ "email": email, "password": password }, function (usuarioValido) {
-        if (!usuarioValido) return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
+//     sistema.loginUsuario({ "email": email, "password": password }, function (usuarioValido) {
+//         if (!usuarioValido) return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
 
-        // Poner cookie igual que Google
-        res.cookie('email', email, {
-            httpOnly: false, // puedes poner true si quieres que solo el servidor la lea
-            secure: false,   // false en local, true en producción HTTPS
-            sameSite: 'lax',
-            path: '/'
-        });
+//         // Poner cookie igual que Google
+//         res.cookie('email', email, {
+//             httpOnly: false, // puedes poner true si quieres que solo el servidor la lea
+//             secure: false,   // false en local, true en producción HTTPS
+//             sameSite: 'lax',
+//             path: '/'
+//         });
 
-        // Redirigir al dashboard o devolver JSON
-        return res.status(200).json({ ok: true });
-    });
-});
+//         // Redirigir al dashboard o devolver JSON
+//         return res.status(200).json({ ok: true });
+//     });
+// });
 
 
 app.get("/ok", function (request, response) {
     //response.send({ nick: request.user.email })
-    // response.cookie('nick', request.user.email, {
-    //         httpOnly: false, // Cámbialo a true si solo quieres que el servidor la lea
-    //         secure: false,   // false porque estás en localhost
-    //         sameSite: 'lax',
-    //         maxAge: 24 * 60 * 60 * 1000 // 24 horas por ejemplo
-    //     });
-    response.redirect(url + '/dashboard');
+    response.cookie('email', request.user.email, {
+            httpOnly: false, // Cámbialo a true si solo quieres que el servidor la lea
+            secure: false,   // false porque estás en localhost
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000 // 24 horas por ejemplo
+        });
+    response.redirect(url + 'dashboard.html');
 });
 
-app.get("/verificarSesion", function (req, res) {
-    // Passport añade esta función automáticamente
-    if (req.isAuthenticated && req.isAuthenticated()) {
-        return res.status(200).json({
-            autenticado: true,
-            user: { email: req.user.email }
-        });
+app.get('/verificarSesion', (req, res) => {
+    if (req.user) {
+        console.log("Usuario autenticado:", req.user);
+        res.json({ auth: true, user: req.user });
     } else {
-        return res.status(401).json({
-            autenticado: false,
-            message: "No hay sesión activa"
-        });
+        res.status(401).json({ auth: false });
     }
 });
 
 // Ruta en tu servidor Express (Puerto 3000)
-app.get('/dashboard', (req, res) => {
-    // Verificamos si Passport tiene al usuario autenticado
-    res.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.header('Pragma', 'no-cache');
-    res.header('Expires', '0');
-    if (req.isAuthenticated()) {
-        res.json({
-            auth: true,
-            user: req.user
-        });
-    } else {
-        // IMPORTANTE: Enviamos 401 para que el Front sepa que debe redirigir
-        res.status(401).json({ auth: false, message: "Sesión expirada o no iniciada" });
-    }
-});
+// app.get('/dashboard', (req, res) => {
+//     // Verificamos si Passport tiene al usuario autenticado
+//     res.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+//     res.header('Pragma', 'no-cache');
+//     res.header('Expires', '0');
+//     if (req.isAuthenticated()) {
+//         res.json({
+//             auth: true,
+//             user: req.user
+//         });
+//     } else {
+//         // IMPORTANTE: Enviamos 401 para que el Front sepa que debe redirigir
+//         res.status(401).json({ auth: false, message: "Sesión expirada o no iniciada" });
+//     }
+// });
 
 // app.post("/cerrarSesion", function (request, response) {
 //     console.log("--> Backend: Iniciando proceso de salida");
@@ -395,6 +397,11 @@ app.get("/obtenerPartidasDisponibles", function (request, response) {
     let lista = sistema.obtenerPartidasDisponibles();
     response.send(lista);
 });
+
+app.use((req, res) => {
+    res.sendFile(path.join(__dirname, 'cliente', 'index.html'));
+});
+//app.all('*', (req, res) => handle(req, res));
 
 // app.listen(PORT, () => {
 //     console.log(`App está escuchando en el puerto ${PORT}`);
