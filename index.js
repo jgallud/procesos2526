@@ -224,7 +224,8 @@ app.get("/ok", function (request, response) {
             sameSite: 'lax',
             maxAge: 24 * 60 * 60 * 1000 // 24 horas por ejemplo
         });
-    response.redirect(url + 'dashboard.html');
+   // response.redirect(url+ 'dashboard.html');
+   return response.status(200).json({ email: request.user.email });
 });
 
 app.get('/verificarSesion', (req, res) => {
