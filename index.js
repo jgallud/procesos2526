@@ -6,6 +6,9 @@ const passport = require("passport");
 const cookieSession = require("cookie-session");
 require("./servidor/passport-setup.js");
 const app = express();
+
+app.set("trust proxy", 1);
+
 //const nextApp = next({ dev:true });
 const httpServer = require('http').Server(app);
 const { Server } = require("socket.io");
@@ -20,6 +23,7 @@ const PORT = process.env.PORT || 3000;
 const url = process.env.urlConfirmar;
 // Instala el paquete cors: npm install cors
 const cors = require('cors');
+const isProduction = process.env.NODE_ENV === "production";
 // app.use(cors({
 //     origin: "http://localhost:3000", // El puerto de tu nuevo Next.js
 //     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -35,7 +39,7 @@ app.use(cookieSession({
     keys: ['patata'],
     maxAge: 24 * 60 * 60 * 1000, // 1 día
     httpOnly: true,
-    secure: true, // true si estás en HTTPS
+    secure: isProduction, // true si estás en HTTPS
     sameSite: 'lax', // 'none' si front y back están en dominios distintos
 }));
 
