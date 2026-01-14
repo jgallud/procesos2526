@@ -39,7 +39,7 @@ app.use(cookieSession({
     keys: ['patata'],
     maxAge: 24 * 60 * 60 * 1000, // 1 día
     httpOnly: true,
-    secure: isProduction, // true si estás en HTTPS
+    secure: true, // true si estás en HTTPS
     sameSite: 'lax', // 'none' si front y back están en dominios distintos
 }));
 
