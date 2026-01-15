@@ -404,7 +404,16 @@ app.get("/obtenerPartidasDisponibles", function (request, response) {
 });
 
 app.use((req, res) => {
-    res.sendFile(path.join(__dirname, 'cliente', 'index.html'));
+    //res.sendFile(path.join(__dirname, 'cliente', 'index.html'));
+    const isFile = req.path.includes('.');
+    
+    if (isFile) {
+        // Si el navegador pide un .css y llegamos aquí, es que NO existe
+        res.status(404).send('Archivo no encontrado');
+    } else {
+        // Si es una ruta de página (ej. /dashboard), servimos el index.html
+        res.sendFile(path.join("cliente", 'index.html'));
+    }
 });
 //app.all('*', (req, res) => handle(req, res));
 
