@@ -1,4 +1,10 @@
 1:"$Sreact.fragment"
+<<<<<<< HEAD
 2:I[61077,["/_next/static/chunks/46daf1e815254b66.js"],"default"]
 3:I[27731,["/_next/static/chunks/46daf1e815254b66.js"],"default"]
 0:{"buildId":"ScPVSfSGISvKh72mCrYDV","rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"loading":null,"isPartial":false}
+=======
+2:I[92111,["/_next/static/chunks/c06bc1422b2476d4.js"],"default"]
+3:I[62399,["/_next/static/chunks/c06bc1422b2476d4.js"],"default"]
+0:{"buildId":"z1mc6JS7_yUxPwqlAsHNy","rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"loading":null,"isPartial":false}
+>>>>>>> 12fdbd6 (estilos front deploy)
