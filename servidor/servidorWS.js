@@ -33,7 +33,7 @@ function ServidorWS(io) {
                     const partida = sistema.partidas[codigo];
                     const jugador = partida.jugadores[datos.email];
                     //console.log(jugador);
-                    srv.enviarAlRemitente(socket, "partidaCreada", { "codigo": codigo,"color": jugador.color });
+                    srv.enviarAlRemitente(socket, "partidaCreada", { "codigo": codigo, "color": jugador.color });
                 }
                 let lista = sistema.obtenerPartidasDisponibles();
                 //console.log(lista);
@@ -43,15 +43,15 @@ function ServidorWS(io) {
                 // pedir a sistema unir a partida
                 let res = sistema.unirAPartida(datos.email, datos.codigo);
                 const partida = sistema.partidas[datos.codigo];
-                let jugador=undefined;
-                if (partida){
+                let jugador = undefined;
+                if (partida) {
                     jugador = partida.jugadores[datos.email];
                 }
                 if (res && partida && jugador) {
                     socket.join(datos.codigo);
-                    srv.enviarAlRemitente(socket, "unidoAPartida", { "codigo": datos.codigo,"color": jugador.color});
-                    srv.enviarATodosEnPartida(io, datos.codigo, "iniciarPartida", 
-                        { "email": datos.email,tablero: partida.tablero, turno: partida.turno });
+                    srv.enviarAlRemitente(socket, "unidoAPartida", { "codigo": datos.codigo, "color": jugador.color });
+                    srv.enviarATodosEnPartida(io, datos.codigo, "iniciarPartida",
+                        { "email": datos.email, tablero: partida.tablero, turno: partida.turno });
                     partida.enCurso = true;
                 }
                 else {
@@ -64,7 +64,7 @@ function ServidorWS(io) {
                 const partida = sistema.partidas[data.codigo]; // tu mapa de partidas
 
                 if (!partida || !partida.enCurso) return;
-                const jugador=partida.jugadores[data.email];
+                const jugador = partida.jugadores[data.email];
                 //const jugador = partida.jugadores.black === socket.id ? "black" : "white";
 
                 if (jugador.color !== partida.turno) {
@@ -78,6 +78,7 @@ function ServidorWS(io) {
                 // Coloca piedra
                 partida.tablero[data.y][data.x] = jugador.color === "black" ? 1 : 2;
 
+                partida.pasesConsecutivos = 0; // Resetear conteo de pases
                 // Aquí podrías llamar a la función de capturas (más adelante)
 
                 // Cambiar turno
@@ -95,6 +96,22 @@ function ServidorWS(io) {
                 //     });
                 // }
             });
+            socket.on("pasarTurno", () => {
+                const partida = obtenerPartida(socket.partidaId);
+
+                if (partida.finalizada) return;
+
+                partida.pasesConsecutivos += 1;
+                partida.turno = partida.turno === "N" ? "B" : "N";
+
+                // ¿Fin de partida?
+                if (partida.pasesConsecutivos >= 2) {
+                    partida.finalizada = true;
+                }
+
+                io.to(partida.id).emit("estadoActualizado", partida);
+            });
+
 
             socket.on("abandonarPartida", function (datos) {
                 let codigoStr = datos.codigo.toString();

@@ -206,6 +206,7 @@ function Partida(codigo, owner) {
   this.maxJug = 2;
   this.turno = "white";
   this.listaCompleta=false;
+  this.pasesConsecutivos=0;
   this.tablero = Array(9).fill(null).map(() => Array(9).fill(0));
   this.asignarJugador = function (usr, color) {
     if (this.jugadores.length >= this.maxJug) {
