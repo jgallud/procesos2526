@@ -43,8 +43,11 @@ function ServidorWS(io) {
                 // pedir a sistema unir a partida
                 let res = sistema.unirAPartida(datos.email, datos.codigo);
                 const partida = sistema.partidas[datos.codigo];
-                const jugador = partida.jugadores[datos.email];
-                if (res) {
+                let jugador=undefined;
+                if (partida){
+                    jugador = partida.jugadores[datos.email];
+                }
+                if (res && partida && jugador) {
                     socket.join(datos.codigo);
                     srv.enviarAlRemitente(socket, "unidoAPartida", { "codigo": datos.codigo,"color": jugador.color});
                     srv.enviarATodosEnPartida(io, datos.codigo, "iniciarPartida", 
