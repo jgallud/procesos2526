@@ -96,20 +96,23 @@ function ServidorWS(io) {
                 //     });
                 // }
             });
-            socket.on("pasarTurno", () => {
-                const partida = obtenerPartida(socket.partidaId);
-
-                if (partida.finalizada) return;
+            socket.on("pasarTurno", (data) => {
+                const partida = sistema.partidas[data.codigo]; 
+                //const partida = obtenerPartida(socket.partidaId);
+                const jugador = partida.jugadores[data.email];
+                if (!partida) return;
 
                 partida.pasesConsecutivos += 1;
-                partida.turno = partida.turno === "N" ? "B" : "N";
-
+               partida.turno = jugador.color === "black" ? "white" : "black";
                 // ¿Fin de partida?
                 if (partida.pasesConsecutivos >= 2) {
                     partida.finalizada = true;
                 }
 
-                io.to(partida.id).emit("estadoActualizado", partida);
+                io.to(data.codigo).emit("jugadaRealizada", {
+                    tablero: partida.tablero,
+                    turno: partida.turno
+                });
             });
 
 
